@@ -5,11 +5,15 @@
 
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
+USE ieee.numeric_std.all;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 LIBRARY ALTERA_MF;
 USE ALTERA_MF.ALTERA_MF_COMPONENTS.ALL;
+
+LIBRARY LPM;
+USE LPM.LPM_COMPONENTS.ALL;
 
 
 ENTITY TONE_GEN IS 
@@ -26,11 +30,35 @@ END TONE_GEN;
 
 ARCHITECTURE gen OF TONE_GEN IS 
 
-	SIGNAL phase_register : STD_LOGIC_VECTOR(8 DOWNTO 0);
-	SIGNAL tuning_word    : STD_LOGIC_VECTOR(4 DOWNTO 0);
+	-- internal signals
+	SIGNAL phase_register : STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL tuning_word    : STD_LOGIC_VECTOR(13 DOWNTO 0);
+	SIGNAL tw_shifted     : STD_LOGIC_VECTOR(13 DOWNTO 0);
+	SIGNAL shift_amnt     : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL sounddata      : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	-- signal from SCOMP
+	SIGNAL note           : STD_LOGIC_VECTOR(6 DOWNTO 0);
+	SIGNAL sharp          : STD_LOGIC;
+	SIGNAL octave         : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	SIGNAL left_vol       : STD_LOGIC_VECTOR(1 DOWNTO 0);
+	SIGNAL right_vol      : STD_LOGIC_VECTOR(1 DOWNTO 0);
+	SIGNAL use_square     : STD_LOGIC;
+	-- base note values
+	SIGNAL C2             : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL C2S            : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL D2             : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL D2S            : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL E2             : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL F2             : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL F2S            : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL G2             : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL G2S            : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL A2             : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL A2S            : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL B2             : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	
 BEGIN
+
 
 	-- ROM to hold the waveform
 	SOUND_LUT : altsyncram
@@ -49,10 +77,25 @@ BEGIN
 	)
 	PORT MAP (
 		clock0 => NOT(SAMPLE_CLK),
-		-- In this design, one bit of the phase register is a fractional bit
-		address_a => phase_register(8 downto 1),
+		address_a => phase_register(15 downto 8),
 		q_a => sounddata -- output is amplitude
 	);
+	
+	
+	-- shifter for tuning word to increase octave
+	shifter: lpm_clshift
+	generic map (
+		 lpm_width     => 14,
+		 lpm_widthdist => 3,
+		 lpm_shifttype => "arithmetic"
+	)
+	port map (
+		 data      => tuning_word,
+		 distance  => shift_amnt,
+		 direction => '0',
+		 result    => tw_shifted
+	);
+	
 	
 	-- 8-bit sound data is used as bits 12-5 of the 16-bit output.
 	-- This is to prevent the output from being too loud.
@@ -65,26 +108,106 @@ BEGIN
 	R_DATA(12 DOWNTO 5) <= sounddata;
 	R_DATA(4 DOWNTO 0) <= "00000"; -- pad right side with 0s
 	
-	-- process to perform DDS
+	
+	-- tuning word for each note in octave 2
+	C2 <= "01011001";
+	C2S <= "01011111";
+	D2 <= "01100100";
+	D2S <= "01101010";
+	E2 <= "01110001";
+	F2 <= "01110111";
+	F2S <= "01111110";
+	G2 <= "10000110";
+	G2S <= "10001110";
+	A2 <= "10010110";
+	A2S <= "10011111";
+	B2 <= "10101001";
+	
+	
+	-- process to update phase register
 	PROCESS(RESETN, SAMPLE_CLK) BEGIN
 		IF RESETN = '0' THEN
-			phase_register <= "000000000";
+			phase_register <= "0000000000000000";
 		ELSIF RISING_EDGE(SAMPLE_CLK) THEN
-			IF tuning_word = "00000" THEN  -- if command is 0, return to 0 output.
-				phase_register <= "000000000";
+			IF tuning_word = "00000000000000" THEN
+				phase_register <= "0000000000000000";
 			ELSE
-				-- Increment the phase register by the tuning word.
-				phase_register <= phase_register + ("0000" & tuning_word);
+				phase_register <= phase_register + ("00" & tw_shifted);
 			END IF;
 		END IF;
 	END PROCESS;
-
-	-- process to latch command data from SCOMP
+			
+			
+	-- process to get input signal and find tuning word
 	PROCESS(RESETN, CS) BEGIN
+
 		IF RESETN = '0' THEN
-			tuning_word <= "00000";
+			 
+			 -- reset to defaults
+			note <= "0000000";
+			sharp <= '0';
+			octave <= "000";
+			left_vol <= "00";
+			right_vol <= "00";
+			use_square <= '0';
+
 		ELSIF RISING_EDGE(CS) THEN
-			tuning_word <= CMD(4 DOWNTO 0);
+		
+			-- parse input signal
+			note <= CMD(15 DOWNTO 9);
+			sharp <= CMD(8);
+			octave <= CMD(7 DOWNTO 5);
+			left_vol <= CMD(4 DOWNTO 3);
+			right_vol <= CMD(2 DOWNTO 1);
+			use_square <= CMD(0);
+			
+			-- set base tuning word according to note/sharp
+			IF note = "1000000" THEN -- c note
+				IF sharp = '1' THEN
+					tuning_word <= "000000" & C2S;
+				ELSE 
+					tuning_word <= "000000" & C2;
+				END IF;
+			ELSIF note = "0100000" THEN -- d note
+				IF sharp = '1' THEN
+					tuning_word <= "000000" & D2S;
+				ELSE 
+					tuning_word <= "000000" & D2;
+				END IF;
+			ELSIF note = "0010000" THEN -- e note
+				tuning_word <= "000000" & E2;
+			ELSIF note = "0001000" THEN -- f note
+				IF sharp = '1' THEN
+					tuning_word <= "000000" & F2S;
+				ELSE 
+					tuning_word <= "000000" & F2;
+				END IF;
+			ELSIF note = "0000100" THEN -- g note
+				IF sharp = '1' THEN
+					tuning_word <= "000000" & G2S;
+				ELSE 
+					tuning_word <= "000000" & G2;
+				END IF;
+			ELSIF note = "0000010" THEN -- a note
+				IF sharp = '1' THEN
+					tuning_word <= "000000" & A2S;
+				ELSE 
+					tuning_word <= "000000" & A2;
+				END IF;
+			ELSIF note = "0000001" THEN -- b note
+				tuning_word <= "000000" & B2;
+			ELSE -- "000" = off			
+				tuning_word <= "00000000000000";
+			END IF;
+			
+			-- adjust shift amount based on octave
+			IF octave = "000" THEN
+				shift_amnt <= "000";
+				tuning_word <= "00000000000000";
+			ELSE
+				shift_amnt <= octave - "001";
+			END IF;
+
 		END IF;
 	END PROCESS;
 END gen;
