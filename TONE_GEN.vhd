@@ -36,6 +36,7 @@ ARCHITECTURE gen OF TONE_GEN IS
 	SIGNAL tw_shifted     : STD_LOGIC_VECTOR(13 DOWNTO 0);
 	SIGNAL shift_amnt     : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL sounddata      : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL sounddata1      : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	-- signal from SCOMP
 	SIGNAL note           : STD_LOGIC_VECTOR(6 DOWNTO 0);
 	SIGNAL sharp          : STD_LOGIC;
@@ -82,6 +83,30 @@ BEGIN
 	);
 	
 	
+	-- ROM to hold the SQUARE waveform
+	SQUARE_LUT : altsyncram
+	GENERIC MAP (
+		lpm_type => "altsyncram",
+		width_a => 8,
+		widthad_a => 8,
+		numwords_a => 256,
+		init_file => "SOUND_SQUARE.mif",
+		intended_device_family => "Cyclone II",
+		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
+		operation_mode => "ROM",
+		outdata_aclr_a => "NONE",
+		outdata_reg_a => "UNREGISTERED",
+		power_up_uninitialized => "FALSE"
+	)
+	PORT MAP (
+		clock0 => NOT(SAMPLE_CLK),
+		-- In this design, one bit of the phase register is a fractional bit
+		address_a => phase_register(8 downto 1),
+		q_a => sounddata1 -- output is amplitude
+	);
+
+
+	
 	-- shifter for tuning word to increase octave
 	shifter: lpm_clshift
 	generic map (
@@ -99,13 +124,13 @@ BEGIN
 	
 	-- 8-bit sound data is used as bits 12-5 of the 16-bit output.
 	-- This is to prevent the output from being too loud.
-	L_DATA(15 DOWNTO 13) <= sounddata(7)&sounddata(7)&sounddata(7); -- sign extend
-	L_DATA(12 DOWNTO 5) <= sounddata;
+	L_DATA(15 DOWNTO 13) <= sounddata(7)&sounddata(7)&sounddata(7) when use_square = '0' else sounddata1(7)&sounddata1(7)&sounddata1(7); -- sign extend
+	L_DATA(12 DOWNTO 5) <= sounddata when use_square = '0' else sounddata1;
 	L_DATA(4 DOWNTO 0) <= "00000"; -- pad right side with 0s
-	
+
 	-- Right channel is the same.
-	R_DATA(15 DOWNTO 13) <= sounddata(7)&sounddata(7)&sounddata(7); -- sign extend
-	R_DATA(12 DOWNTO 5) <= sounddata;
+	R_DATA(15 DOWNTO 13) <= sounddata(7)&sounddata(7)&sounddata(7) when use_square = '0' else sounddata1(7)&sounddata1(7)&sounddata1(7); -- sign extend
+	R_DATA(12 DOWNTO 5) <= sounddata when use_square = '0' else sounddata1;
 	R_DATA(4 DOWNTO 0) <= "00000"; -- pad right side with 0s
 	
 	
