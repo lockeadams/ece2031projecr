@@ -101,7 +101,7 @@ BEGIN
 	PORT MAP (
 		clock0 => NOT(SAMPLE_CLK),
 		-- In this design, one bit of the phase register is a fractional bit
-		address_a => phase_register(8 downto 1),
+		address_a => phase_register(15 downto 8),
 		q_a => sounddata1 -- output is amplitude
 	);
 

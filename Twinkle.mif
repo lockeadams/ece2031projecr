@@ -1,0 +1,200 @@
+-- Altera Memory Initialization File (MIF)
+
+DEPTH = 2048;
+WIDTH = 16;
+
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+
+CONTENT
+  BEGIN
+    [000..7FF] : 0000;  -- Default to NOP
+
+           000 : 9000;  --     IN Switches
+           001 : 18B4;  --     ADD C
+           002 : 9840;  --     OUT Beep
+           003 : 80AF;  --     CALL Delay
+           004 : 9000;  --     IN Switches
+           005 : 18B4;  --     ADD C
+           006 : 9840;  --     OUT Beep
+           007 : 80AF;  --     CALL Delay
+           008 : 9000;  --     IN Switches
+           009 : 18B8;  --     ADD G
+           00A : 9840;  --     OUT Beep
+           00B : 80AF;  --     CALL Delay
+           00C : 9000;  --     IN Switches
+           00D : 18B8;  --     ADD G
+           00E : 9840;  --     OUT Beep
+           00F : 80AF;  --     CALL Delay
+           010 : 9000;  --     IN Switches
+           011 : 18B9;  --     ADD A
+           012 : 9840;  --     OUT Beep
+           013 : 80AF;  --     CALL Delay
+           014 : 9000;  --     IN Switches
+           015 : 18B9;  --     ADD A
+           016 : 9840;  --     OUT Beep
+           017 : 80AF;  --     CALL Delay
+           018 : 9000;  --     IN Switches
+           019 : 18B8;  --     ADD G
+           01A : 9840;  --     OUT Beep
+           01B : 80AF;  --     CALL Delay
+           01C : 80AF;  --     CALL Delay
+           01D : 9000;  --     IN Switches
+           01E : 18B7;  --     ADD F
+           01F : 9840;  --     OUT Beep
+           020 : 80AF;  --     CALL Delay
+           021 : 9000;  --     IN Switches
+           022 : 18B7;  --     ADD F
+           023 : 9840;  --     OUT Beep
+           024 : 80AF;  --     CALL Delay
+           025 : 9000;  --     IN Switches
+           026 : 18B6;  --     ADD E
+           027 : 9840;  --     OUT Beep
+           028 : 80AF;  --     CALL Delay
+           029 : 9000;  --     IN Switches
+           02A : 18B6;  --     ADD E
+           02B : 9840;  --     OUT Beep
+           02C : 80AF;  --     CALL Delay
+           02D : 9000;  --     IN Switches
+           02E : 18B5;  --     ADD D
+           02F : 9840;  --     OUT Beep
+           030 : 80AF;  --     CALL Delay
+           031 : 9000;  --     IN Switches
+           032 : 18B5;  --     ADD D
+           033 : 9840;  --     OUT Beep
+           034 : 80AF;  --     CALL Delay
+           035 : 9000;  --     IN Switches
+           036 : 18B4;  --     ADD C
+           037 : 9840;  --     OUT Beep
+           038 : 80AF;  --     CALL Delay
+           039 : 80AF;  --     CALL Delay
+           03A : 9000;  --     IN Switches
+           03B : 18B8;  --     ADD G
+           03C : 9840;  --     OUT Beep
+           03D : 80AF;  --     CALL Delay
+           03E : 9000;  --     IN Switches
+           03F : 18B8;  --     ADD G
+           040 : 9840;  --     OUT Beep
+           041 : 80AF;  --     CALL Delay
+           042 : 9000;  --     IN Switches
+           043 : 18B7;  --     ADD F
+           044 : 9840;  --     OUT Beep
+           045 : 80AF;  --     CALL Delay
+           046 : 9000;  --     IN Switches
+           047 : 18B7;  --     ADD F
+           048 : 9840;  --     OUT Beep
+           049 : 80AF;  --     CALL Delay
+           04A : 9000;  --     IN Switches
+           04B : 18B6;  --     ADD E
+           04C : 9840;  --     OUT Beep
+           04D : 80AF;  --     CALL Delay
+           04E : 9000;  --     IN Switches
+           04F : 18B6;  --     ADD E
+           050 : 9840;  --     OUT Beep
+           051 : 80AF;  --     CALL Delay
+           052 : 9000;  --     IN Switches
+           053 : 18B5;  --     ADD D
+           054 : 9840;  --     OUT Beep
+           055 : 80AF;  --     CALL Delay
+           056 : 80AF;  --     CALL Delay
+           057 : 9000;  --     IN Switches
+           058 : 18B8;  --     ADD G
+           059 : 9840;  --     OUT Beep
+           05A : 80AF;  --     CALL Delay
+           05B : 9000;  --     IN Switches
+           05C : 18B8;  --     ADD G
+           05D : 9840;  --     OUT Beep
+           05E : 80AF;  --     CALL Delay
+           05F : 9000;  --     IN Switches
+           060 : 18B7;  --     ADD F
+           061 : 9840;  --     OUT Beep
+           062 : 80AF;  --     CALL Delay
+           063 : 9000;  --     IN Switches
+           064 : 18B7;  --     ADD F
+           065 : 9840;  --     OUT Beep
+           066 : 80AF;  --     CALL Delay
+           067 : 9000;  --     IN Switches
+           068 : 18B6;  --     ADD E
+           069 : 9840;  --     OUT Beep
+           06A : 80AF;  --     CALL Delay
+           06B : 9000;  --     IN Switches
+           06C : 18B6;  --     ADD E
+           06D : 9840;  --     OUT Beep
+           06E : 80AF;  --     CALL Delay
+           06F : 9000;  --     IN Switches
+           070 : 18B5;  --     ADD D
+           071 : 9840;  --     OUT Beep
+           072 : 80AF;  --     CALL Delay
+           073 : 80AF;  --     CALL Delay
+           074 : 9000;  --     IN Switches
+           075 : 18B4;  --     ADD C
+           076 : 9840;  --     OUT Beep
+           077 : 80AF;  --     CALL Delay
+           078 : 9000;  --     IN Switches
+           079 : 18B4;  --     ADD C
+           07A : 9840;  --     OUT Beep
+           07B : 80AF;  --     CALL Delay
+           07C : 9000;  --     IN Switches
+           07D : 18B8;  --     ADD G
+           07E : 9840;  --     OUT Beep
+           07F : 80AF;  --     CALL Delay
+           080 : 9000;  --     IN Switches
+           081 : 18B8;  --     ADD G
+           082 : 9840;  --     OUT Beep
+           083 : 80AF;  --     CALL Delay
+           084 : 9000;  --     IN Switches
+           085 : 18B9;  --     ADD A
+           086 : 9840;  --     OUT Beep
+           087 : 80AF;  --     CALL Delay
+           088 : 9000;  --     IN Switches
+           089 : 18B9;  --     ADD A
+           08A : 9840;  --     OUT Beep
+           08B : 80AF;  --     CALL Delay
+           08C : 9000;  --     IN Switches
+           08D : 18B8;  --     ADD G
+           08E : 9840;  --     OUT Beep
+           08F : 80AF;  --     CALL Delay
+           090 : 80AF;  --     CALL Delay
+           091 : 9000;  --     IN Switches
+           092 : 18B7;  --     ADD F
+           093 : 9840;  --     OUT Beep
+           094 : 80AF;  --     CALL Delay
+           095 : 9000;  --     IN Switches
+           096 : 18B7;  --     ADD F
+           097 : 9840;  --     OUT Beep
+           098 : 80AF;  --     CALL Delay
+           099 : 9000;  --     IN Switches
+           09A : 18B6;  --     ADD E
+           09B : 9840;  --     OUT Beep
+           09C : 80AF;  --     CALL Delay
+           09D : 9000;  --     IN Switches
+           09E : 18B6;  --     ADD E
+           09F : 9840;  --     OUT Beep
+           0A0 : 80AF;  --     CALL Delay
+           0A1 : 9000;  --     IN Switches
+           0A2 : 18B5;  --     ADD D
+           0A3 : 9840;  --     OUT Beep
+           0A4 : 80AF;  --     CALL Delay
+           0A5 : 9000;  --     IN Switches
+           0A6 : 18B5;  --     ADD D
+           0A7 : 9840;  --     OUT Beep
+           0A8 : 80AF;  --     CALL Delay
+           0A9 : 9000;  --     IN Switches
+           0AA : 18B4;  --     ADD C
+           0AB : 9840;  --     OUT Beep
+           0AC : 80AF;  --     CALL Delay
+           0AD : 80AF;  --     CALL Delay
+           0AE : 2800;  --     JUMP Song
+           0AF : 9802;  -- 	OUT    Timer
+           0B0 : 9002;  -- 	IN     Timer
+           0B1 : 6FFE;  -- 	ADDI   -2
+           0B2 : 30B0;  -- 	JNEG   WaitingLoop
+           0B3 : 8800;  -- 	RETURN
+           0B4 : 8000;  -- C: DW &B1000000000000000
+           0B5 : 4000;  -- D: DW &B0100000000000000
+           0B6 : 2000;  -- E: DW &B0010000000000000
+           0B7 : 1000;  -- F: DW &B0001000000000000
+           0B8 : 0800;  -- G: DW &B0000100000000000
+           0B9 : 0400;  -- A: DW &B0000010000000000
+           0BA : 0200;  -- B: DW &B0000001000000000
+  END;
