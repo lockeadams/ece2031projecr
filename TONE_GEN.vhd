@@ -24,8 +24,7 @@ ENTITY TONE_GEN IS
 		SAMPLE_CLK : IN  STD_LOGIC;
 		RESETN     : IN  STD_LOGIC;
 		L_DATA     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		R_DATA     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		VolData	  : IN  STD_LOGIC
+		R_DATA     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
 	);
 END TONE_GEN;
 
@@ -37,6 +36,7 @@ ARCHITECTURE gen OF TONE_GEN IS
 	SIGNAL tw_shifted     : STD_LOGIC_VECTOR(13 DOWNTO 0);
 	SIGNAL shift_amnt     : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL sounddata      : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL sounddata1      : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	SIGNAL soundOutRight	 : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL soundOutLeft	 : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	-- signal from SCOMP
@@ -85,6 +85,30 @@ BEGIN
 	);
 	
 	
+	-- ROM to hold the SQUARE waveform
+	SQUARE_LUT : altsyncram
+	GENERIC MAP (
+		lpm_type => "altsyncram",
+		width_a => 8,
+		widthad_a => 8,
+		numwords_a => 256,
+		init_file => "SOUND_SQUARE.mif",
+		intended_device_family => "Cyclone II",
+		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
+		operation_mode => "ROM",
+		outdata_aclr_a => "NONE",
+		outdata_reg_a => "UNREGISTERED",
+		power_up_uninitialized => "FALSE"
+	)
+	PORT MAP (
+		clock0 => NOT(SAMPLE_CLK),
+		-- In this design, one bit of the phase register is a fractional bit
+		address_a => phase_register(15 downto 8),
+		q_a => sounddata1 -- output is amplitude
+	);
+
+
+	
 	-- shifter for tuning word to increase octave
 	shifter: lpm_clshift
 	generic map (
@@ -100,8 +124,7 @@ BEGIN
 	);
 	
 	
-	-- 8-bit sound data is used as bits 12-5 of the 16-bit output.
-	-- This is to prevent the output from being too loud.
+	-- assign outputs
 	L_DATA <= soundOutLeft;
 	R_DATA <= soundOutRight;
 	
@@ -133,42 +156,8 @@ BEGIN
 			END IF;
 		END IF;
 	END PROCESS;
-	
-	
-	PROCESS(RESETN, VolData) BEGIN
-		IF RESETN = '0' THEN
-			left_vol <= "00";
-			right_vol <= "00";
-		ELSIF RISING_EDGE(VolData) THEN
-			left_vol <= CMD(4 DOWNTO 3);
-			right_vol <= CMD(2 DOWNTO 1);
-		END IF;
-	END PROCESS;
-	
-	PROCESS(left_vol, soundOutLeft, sounddata) BEGIN
-		IF left_vol = "00" THEN
-			soundOutLeft <= "0000000000000000";
-		ELSIF left_vol = "01" THEN
-			soundOutLeft <= "0000" & sounddata & "0000";
-		ELSIF left_vol = "10" THEN
-			soundOutLeft <= sounddata(7)&sounddata(7)&"000000"&sounddata;
-		ELSIF left_vol = "11" THEN
-			soundOutLeft <= sounddata(7)& "000000" & sounddata & "0";
-		END IF;
-	END PROCESS;
-	
-	PROCESS(right_vol, soundOutRight, sounddata) BEGIN
-		IF right_vol = "00" THEN
-			soundOutRight <= "0000000000000000";
-		ELSIF right_vol = "01" THEN
-			soundOutRight <= "0000" & sounddata & "0000";
-		ELSIF right_vol = "10" THEN
-			soundOutRight <= sounddata(7)&sounddata(7)&"000000"&sounddata;
-		ELSIF right_vol = "11" THEN
-			soundOutRight <=  sounddata(7)& "000000" & sounddata & "0";
-		END IF;
-	END PROCESS;
-	
+			
+			
 	-- process to get input signal and find tuning word
 	PROCESS(RESETN, CS) BEGIN
 
@@ -178,6 +167,8 @@ BEGIN
 			note <= "0000000";
 			sharp <= '0';
 			octave <= "000";
+			left_vol <= "00";
+			right_vol <= "00";
 			use_square <= '0';
 
 		ELSIF RISING_EDGE(CS) THEN
@@ -186,7 +177,8 @@ BEGIN
 			note <= CMD(15 DOWNTO 9);
 			sharp <= CMD(8);
 			octave <= CMD(7 DOWNTO 5);
-
+			left_vol <= CMD(4 DOWNTO 3);
+			right_vol <= CMD(2 DOWNTO 1);
 			use_square <= CMD(0);
 			
 			-- set base tuning word according to note/sharp
@@ -238,4 +230,56 @@ BEGIN
 
 		END IF;
 	END PROCESS;
+	
+	-- process to set left volume level
+	PROCESS(left_vol, use_square, sounddata, sounddata1) BEGIN
+		IF left_vol = "00" THEN
+			soundOutLeft <= "0000000000000000";
+		ELSIF left_vol = "01" THEN
+			if use_square = '0' then
+				soundOutLeft <= "0000" & sounddata & "0000";
+			else
+				soundOutLeft <= "0000" & sounddata1 & "0000";
+			end if;
+		ELSIF left_vol = "10" THEN
+			if use_square = '0' then
+				soundOutLeft <= sounddata(7)&sounddata(7)&"000000"&sounddata;
+			else
+				soundOutLeft <= sounddata1(7)&sounddata1(7)&"000000"&sounddata1;
+			end if;
+		ELSIF left_vol = "11" THEN
+			if use_square = '0' then
+				soundOutLeft <= sounddata(7)& "000000" & sounddata & "0";
+			else
+				soundOutLeft <= sounddata1(7)& "000000" & sounddata1 & "0";
+			end if;
+		END IF;
+	END PROCESS;
+	
+	-- process to set right volume level
+	PROCESS(right_vol, use_square, sounddata, sounddata1) BEGIN
+		IF right_vol = "00" THEN
+			soundOutRight <= "0000000000000000";
+		ELSIF right_vol = "01" THEN
+			if use_square = '0' then
+				soundOutRight <= "0000" & sounddata & "0000";
+			else
+				soundOutRight <= "0000" & sounddata1 & "0000";
+			end if;
+		ELSIF right_vol = "10" THEN
+			if use_square = '0' then
+				soundOutRight <= sounddata(7)&sounddata(7)&"000000"&sounddata;
+			else
+				soundOutRight <= sounddata1(7)&sounddata1(7)&"000000"&sounddata1;
+			end if;
+		ELSIF right_vol = "11" THEN
+			if use_square = '0' then
+				soundOutRight <= sounddata(7)& "000000" & sounddata & "0";
+			else
+				soundOutRight <= sounddata1(7)& "000000" & sounddata1 & "0";
+			end if;
+		END IF;
+	END PROCESS;
+	
+	
 END gen;
