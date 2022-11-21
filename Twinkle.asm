@@ -2,41 +2,47 @@
 ; Plays Twinkle Twinkle Little Star
 
 ORG 0
-
 Song:
 
     ; C
-    LOAD C
+    IN Switches
+    ADD C
     OUT Beep
     CALL Delay
 
     ; C
-    LOAD C
+    IN Switches
+    ADD C
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; A
-    LOAD A
+    IN Switches
+    ADD A
     OUT Beep
     CALL Delay
 
     ; A
-    LOAD A
+    IN Switches
+    ADD A
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
@@ -44,37 +50,44 @@ Song:
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; D
-    LOAD D
+    IN Switches
+    ADD D
     OUT Beep
     CALL Delay
 
     ; D
-    LOAD D
+    IN Switches
+    ADD D
     OUT Beep
     CALL Delay
 
     ; C
-    LOAD C
+    IN Switches
+    ADD C
     OUT Beep
     CALL Delay
 
@@ -82,37 +95,44 @@ Song:
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; D
-    LOAD D
+    IN Switches
+    ADD D
     OUT Beep
     CALL Delay
 
@@ -120,37 +140,44 @@ Song:
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; D
-    LOAD D
+    IN Switches
+    ADD D
     OUT Beep
     CALL Delay
 
@@ -158,37 +185,44 @@ Song:
     CALL Delay
 
     ; C
-    LOAD C
+    IN Switches
+    ADD C
     OUT Beep
     CALL Delay
 
     ; C
-    LOAD C
+    IN Switches
+    ADD C
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
     ; A
-    LOAD A
+    IN Switches
+    ADD A
     OUT Beep
     CALL Delay
 
     ; A
-    LOAD A
+    IN Switches
+    ADD A
     OUT Beep
     CALL Delay
 
     ; G
-    LOAD G
+    IN Switches
+    ADD G
     OUT Beep
     CALL Delay
 
@@ -196,37 +230,44 @@ Song:
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; F
-    LOAD F
+    IN Switches
+    ADD F
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; E
-    LOAD E
+    IN Switches
+    ADD E
     OUT Beep
     CALL Delay
 
     ; D
-    LOAD D
+    IN Switches
+    ADD D
     OUT Beep
     CALL Delay
 
     ; D
-    LOAD D
+    IN Switches
+    ADD D
     OUT Beep
     CALL Delay
 
     ; C
-    LOAD C
+    IN Switches
+    ADD C
     OUT Beep
     CALL Delay
 
@@ -235,6 +276,7 @@ Song:
 
     ; Restart Song
     JUMP Song
+
 
 Delay:
 	OUT    Timer
@@ -245,15 +287,14 @@ WaitingLoop:
 	RETURN
 
 
-
 ; Notes
-C: DW &B1000000001000000
-D: DW &B0100000001000000
-E: DW &B0010000001000000
-F: DW &B0001000001000000
-G: DW &B0000100001000000
-A: DW &B0000010001000000
-B: DW &B0000001001000000
+C: DW &B1000000000000000
+D: DW &B0100000000000000
+E: DW &B0010000000000000
+F: DW &B0001000000000000
+G: DW &B0000100000000000
+A: DW &B0000010000000000
+B: DW &B0000001000000000
 
 ; IO address constants
 Switches:  EQU 000
