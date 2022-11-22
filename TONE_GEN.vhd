@@ -37,6 +37,8 @@ ARCHITECTURE gen OF TONE_GEN IS
 	SIGNAL shift_amnt     : STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL sounddata      : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	SIGNAL sounddata1      : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	SIGNAL soundOutRight	 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL soundOutLeft	 : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	-- signal from SCOMP
 	SIGNAL note           : STD_LOGIC_VECTOR(6 DOWNTO 0);
 	SIGNAL sharp          : STD_LOGIC;
@@ -122,16 +124,9 @@ BEGIN
 	);
 	
 	
-	-- 8-bit sound data is used as bits 12-5 of the 16-bit output.
-	-- This is to prevent the output from being too loud.
-	L_DATA(15 DOWNTO 13) <= sounddata(7)&sounddata(7)&sounddata(7) when use_square = '0' else sounddata1(7)&sounddata1(7)&sounddata1(7); -- sign extend
-	L_DATA(12 DOWNTO 5) <= sounddata when use_square = '0' else sounddata1;
-	L_DATA(4 DOWNTO 0) <= "00000"; -- pad right side with 0s
-
-	-- Right channel is the same.
-	R_DATA(15 DOWNTO 13) <= sounddata(7)&sounddata(7)&sounddata(7) when use_square = '0' else sounddata1(7)&sounddata1(7)&sounddata1(7); -- sign extend
-	R_DATA(12 DOWNTO 5) <= sounddata when use_square = '0' else sounddata1;
-	R_DATA(4 DOWNTO 0) <= "00000"; -- pad right side with 0s
+	-- assign outputs
+	L_DATA <= soundOutLeft;
+	R_DATA <= soundOutRight;
 	
 	
 	-- tuning word for each note in octave 2
@@ -235,4 +230,25 @@ BEGIN
 
 		END IF;
 	END PROCESS;
+	
+	soundOutLeft <=
+		"0000000000000000" when left_vol = "00" else
+		sounddata(7) & sounddata & "0000000" when left_vol = "11" and use_square = '0' else
+		sounddata1(7) & sounddata1 & "0000000" when left_vol = "11" and use_square = '1' else
+		sounddata(7) & sounddata(7) & sounddata(7) & sounddata & "00000" when left_vol = "10" and use_square = '0' else
+		sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1 & "00000" when left_vol = "10" and use_square = '1' else
+		sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata & "000" when left_vol = "01" and use_square = '0' else
+		sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1 & "000" when left_vol = "01" and use_square = '1';
+
+	soundOutRight <=
+		"0000000000000000" when right_vol = "00" else
+		sounddata(7) & sounddata & "0000000" when right_vol = "11" and use_square = '0' else
+		sounddata1(7) & sounddata1 & "0000000" when right_vol = "11" and use_square = '1' else
+		sounddata(7) & sounddata(7) & sounddata(7) & sounddata & "00000" when right_vol = "10" and use_square = '0' else
+		sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1 & "00000" when right_vol = "10" and use_square = '1' else
+		sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata & "000" when right_vol = "01" and use_square = '0' else
+		sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1 & "000" when right_vol = "01" and use_square = '1';
+
+	
+	
 END gen;
