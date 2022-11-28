@@ -23,5 +23,5 @@ def write_square(filename: str, size: int) -> None:
         file.write("END;")
 
 if __name__ == '__main__':
-    write_sine("SOUND_SINE_1024.mif", 1024)
-    write_square("SOUND_SQUARE_1024.mif", 1024)
+    write_sine("SOUND_SINE_32768.mif", 32768)
+    write_square("SOUND_SQUARE_32768.mif", 32768)
