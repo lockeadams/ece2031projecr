@@ -68,9 +68,9 @@ BEGIN
 	GENERIC MAP (
 		lpm_type => "altsyncram",
 		width_a => 8,
-		widthad_a => 8,
-		numwords_a => 256,
-		init_file => "SOUND_SINE.mif",
+		widthad_a => 10,
+		numwords_a => 1024,
+		init_file => "SOUND_SINE_1024.mif",
 		intended_device_family => "Cyclone II",
 		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
 		operation_mode => "ROM",
@@ -80,7 +80,7 @@ BEGIN
 	)
 	PORT MAP (
 		clock0 => NOT(SAMPLE_CLK),
-		address_a => phase_register(15 downto 8),
+		address_a => phase_register(15 downto 6),
 		q_a => sounddata -- output is amplitude
 	);
 	
@@ -90,9 +90,9 @@ BEGIN
 	GENERIC MAP (
 		lpm_type => "altsyncram",
 		width_a => 8,
-		widthad_a => 8,
-		numwords_a => 256,
-		init_file => "SOUND_SQUARE.mif",
+		widthad_a => 10,
+		numwords_a => 1024,
+		init_file => "SOUND_SQUARE_1024.mif",
 		intended_device_family => "Cyclone II",
 		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
 		operation_mode => "ROM",
@@ -103,7 +103,7 @@ BEGIN
 	PORT MAP (
 		clock0 => NOT(SAMPLE_CLK),
 		-- In this design, one bit of the phase register is a fractional bit
-		address_a => phase_register(15 downto 8),
+		address_a => phase_register(15 downto 6),
 		q_a => sounddata1 -- output is amplitude
 	);
 
