@@ -1,7 +1,7 @@
--- Simple DDS tone generator.
--- 5-bit tuning word
--- 9-bit phase register
--- 256 x 8-bit ROM.
+-- Peripheral to output sound data to DAC.
+-- Can play arbitrary notes within audible frequency range.
+-- Supports stereo balance and square/sine wave selection.
+-- 2 x 256 x 8-bit ROM's.
 
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
@@ -63,7 +63,7 @@ ARCHITECTURE gen OF TONE_GEN IS
 BEGIN
 
 
-	-- ROM to hold the waveform
+	-- ROM to hold the sine waveform
 	SOUND_LUT : altsyncram
 	GENERIC MAP (
 		lpm_type => "altsyncram",
@@ -85,7 +85,7 @@ BEGIN
 	);
 	
 	
-	-- ROM to hold the SQUARE waveform
+	-- ROM to hold the square waveform
 	SQUARE_LUT : altsyncram
 	GENERIC MAP (
 		lpm_type => "altsyncram",
@@ -102,11 +102,9 @@ BEGIN
 	)
 	PORT MAP (
 		clock0 => NOT(SAMPLE_CLK),
-		-- In this design, one bit of the phase register is a fractional bit
-		address_a => phase_register(15 downto 8),
+		address_a => phase_register(15 downto 8), -- use phase truncation
 		q_a => sounddata1 -- output is amplitude
 	);
-
 
 	
 	-- shifter for tuning word to increase octave
@@ -231,6 +229,8 @@ BEGIN
 		END IF;
 	END PROCESS;
 	
+
+	-- set left channel output based on left volume level
 	soundOutLeft <=
 		"0000000000000000" when left_vol = "00" else
 		sounddata(7) & sounddata & "0000000" when left_vol = "11" and use_square = '0' else
@@ -240,6 +240,8 @@ BEGIN
 		sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata & "000" when left_vol = "01" and use_square = '0' else
 		sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1 & "000" when left_vol = "01" and use_square = '1';
 
+		
+	-- set right channel output based on right volume level
 	soundOutRight <=
 		"0000000000000000" when right_vol = "00" else
 		sounddata(7) & sounddata & "0000000" when right_vol = "11" and use_square = '0' else
@@ -248,7 +250,6 @@ BEGIN
 		sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1 & "00000" when right_vol = "10" and use_square = '1' else
 		sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata(7) & sounddata & "000" when right_vol = "01" and use_square = '0' else
 		sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1(7) & sounddata1 & "000" when right_vol = "01" and use_square = '1';
-
 	
 	
 END gen;
