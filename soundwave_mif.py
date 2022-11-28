@@ -11,7 +11,7 @@ def write_sine(filename: str, size: int) -> None:
     write_header(filename, size)
     with open(filename, 'a') as file:
         for i in range(size):
-            file.write(str(i) + " : " + str(int(127 * math.sin(2 * math.pi * i / size))) + ";\n")
+            file.write(str(i) + " : " + str(int(127.5 * math.sin(2 * math.pi * i / size))) + ";\n")
         file.write("END;")
 
 def write_square(filename: str, size: int) -> None:
@@ -19,7 +19,7 @@ def write_square(filename: str, size: int) -> None:
     write_header(filename, size)
     with open(filename, 'a') as file:
         for i in range(size):
-            file.write(str(i) + " : " + str(int(127 * math.copysign(1, math.sin(2 * math.pi * i / size)))) + ";\n")
+            file.write(str(i) + " : " + str(int(127.5 * math.copysign(1, math.sin(2 * math.pi * i / size)))) + ";\n")
         file.write("END;")
 
 if __name__ == '__main__':
