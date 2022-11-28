@@ -12,6 +12,7 @@ def write_sine(filename: str, size: int) -> None:
     with open(filename, 'a') as file:
         for i in range(size):
             file.write(str(i) + " : " + str(int(127 * math.sin(2 * math.pi * i / size))) + ";\n")
+        file.write("END;")
 
 def write_square(filename: str, size: int) -> None:
     """Write the square wave to the file."""
@@ -19,6 +20,7 @@ def write_square(filename: str, size: int) -> None:
     with open(filename, 'a') as file:
         for i in range(size):
             file.write(str(i) + " : " + str(int(127 * math.copysign(1, math.sin(2 * math.pi * i / size)))) + ";\n")
+        file.write("END;")
 
 if __name__ == '__main__':
     write_sine("SOUND_SINE_1024.mif", 1024)
